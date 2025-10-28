@@ -1,8 +1,22 @@
 using Luxor
 using Luxor.Colors
-using XML
+using LightXML
 using DelimitedFiles
 using QuadGK
+using LightXML
+
+function extract_first_path_d(svg_file)
+    xdoc = parse_file(svg_file)
+    xroot = root(xdoc)
+    first_path = find_element(xroot, "path")
+    
+    if first_path ≠ nothing
+        d_attr = attribute(first_path, "d")
+        return d_attr
+    else
+        return nothing
+    end
+end
 function p(x,y) return Point(x,y) end
 Base.abs(p::Point) = sqrt(p[1]^2+p[2]^2)
 function Lerp(x,y,ratio=0.5)
@@ -244,37 +258,30 @@ width=4000
 height=2500
 println("Calculate coeffs — 1, Draw closed path — 0")
 option = readline()
-if option != "0" && option!="1" println("Incorrect input")
+if option ≠ "0" && option≠"1" println("Incorrect input"); return nothing end
+num_coeffs=nothing
 if option=="1" 
 println("number of coeffs")
 num_coeffs=parse(Int,readline())
-
 end
-else
-a=""
-open("line.txt","r") do file
-d=readline(file)
+println("Path to svg file")
+svg_file_path=readline()
+d=extract_first_path_d(svg_file_path)
+if isnothing(d) println("Некорретный файл") else
 a=read_d_string(d)
 a=connect_closed_paths(a,0.01)
 if option=="1" res=calculate_Fourier_coeffs(a,num_coeffs)
 writedlm("coeffs.txt", res) end
 if option=="0" 
     @png begin
-    origin(width*1/5,height/5)
-    scale(8)
+    origin(width/5,height/5)
+    scale(6)
     background(RGB(0,0,0))
     setcolor(RGB(1,1,1))
     setline(0.9)
     draw_closed_path(a,0.001,0)
     end width height "picture.png"
+end  
 end
-end  end
-#=@draw begin
-    background(RGB(0,0,0))
-    setcolor(RGB(1,1,1))
-    setline(1)
-draw_closed_path(a,0.001,0)
-end 800 800=#
-
 
 end
