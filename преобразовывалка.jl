@@ -1,4 +1,3 @@
-cd("C:\\Users\\DANIL\\Desktop\\песочница\\Рисовалка\\new thingy")
 using Luxor
 using Luxor.Colors
 using XML
@@ -276,5 +275,6 @@ end  end
     setline(1)
 draw_closed_path(a,0.001,0)
 end 800 800=#
+
 
 end
